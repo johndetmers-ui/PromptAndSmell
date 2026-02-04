@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, History, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sparkles, History, ChevronLeft, ChevronRight, Cpu, Play } from "lucide-react";
 import PromptInput from "@/components/PromptInput";
 import ScentWheel from "@/components/ScentWheel";
 import NotePyramid from "@/components/NotePyramid";
@@ -94,6 +94,8 @@ function CreatePageInner() {
   const [isIterating, setIsIterating] = useState(false);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [showHistory, setShowHistory] = useState(true);
+  const [generationMode, setGenerationMode] = useState<"ai" | "demo" | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Handle pre-filled prompt from URL
   useEffect(() => {
@@ -103,13 +105,46 @@ function CreatePageInner() {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const showToast = useCallback((message: string) => {
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(null), 4000);
+  }, []);
+
   const handleGenerate = useCallback(async (prompt: string) => {
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1500 + Math.random() * 1000));
+    let newFormula: OSCFormula | null = null;
+    let mode: "ai" | "demo" = "demo";
 
-    const newFormula = generateMockFormula(prompt);
+    try {
+      const res = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, intensity: 5 }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.formula) {
+        // Map API response to OSCFormula type
+        newFormula = data.formula as OSCFormula;
+        mode = "ai";
+      } else if (data.demo) {
+        // API explicitly says to use demo mode (e.g. no API key)
+        showToast("API key not configured -- using demo mode");
+        newFormula = generateMockFormula(prompt);
+        mode = "demo";
+      } else {
+        throw new Error(data.error || "API request failed");
+      }
+    } catch {
+      // Network error or unexpected failure -- fall back to mock
+      showToast("Could not reach API -- falling back to demo mode");
+      await new Promise((r) => setTimeout(r, 800 + Math.random() * 500));
+      newFormula = generateMockFormula(prompt);
+      mode = "demo";
+    }
+
+    setGenerationMode(mode);
     setFormula(newFormula);
     setHistory([
       {
@@ -121,33 +156,58 @@ function CreatePageInner() {
       },
     ]);
     setIsLoading(false);
-  }, []);
+  }, [showToast]);
 
   const handleIterate = useCallback(
     async (modification: string) => {
       if (!formula) return;
       setIsIterating(true);
 
-      await new Promise((r) => setTimeout(r, 1000 + Math.random() * 800));
+      let modifiedFormula: OSCFormula | null = null;
+      let mode: "ai" | "demo" = "demo";
 
-      const modifiedFormula = generateMockFormula(
-        `${formula.prompt} -- ${modification}`
-      );
-      modifiedFormula.name = formula.name;
+      try {
+        const res = await fetch("/api/iterate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ modification, current_formula: formula }),
+        });
+        const data = await res.json();
+
+        if (res.ok && data.formula) {
+          modifiedFormula = data.formula as OSCFormula;
+          mode = "ai";
+        } else if (data.demo) {
+          showToast("API key not configured -- using demo mode");
+          modifiedFormula = generateMockFormula(`${formula.prompt} -- ${modification}`);
+          modifiedFormula.name = formula.name;
+          mode = "demo";
+        } else {
+          throw new Error(data.error || "API request failed");
+        }
+      } catch {
+        showToast("Could not reach API -- falling back to demo mode");
+        await new Promise((r) => setTimeout(r, 600 + Math.random() * 400));
+        modifiedFormula = generateMockFormula(`${formula.prompt} -- ${modification}`);
+        modifiedFormula.name = formula.name;
+        mode = "demo";
+      }
+
+      setGenerationMode(mode);
       setFormula(modifiedFormula);
       setHistory((prev) => [
         ...prev,
         {
-          id: modifiedFormula.id,
+          id: modifiedFormula!.id,
           prompt: modification,
-          formula: modifiedFormula,
+          formula: modifiedFormula!,
           timestamp: new Date().toISOString(),
           type: "iteration",
         },
       ]);
       setIsIterating(false);
     },
-    [formula]
+    [formula, showToast]
   );
 
   const handleRestore = useCallback((entry: HistoryEntry) => {
@@ -203,9 +263,26 @@ function CreatePageInner() {
                 <div className="card">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-100">
-                        {formula.name}
-                      </h2>
+                      <div className="flex items-center gap-2">
+                        <h2 className="text-2xl font-bold text-gray-100">
+                          {formula.name}
+                        </h2>
+                        {generationMode && (
+                          <span
+                            className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                              generationMode === "ai"
+                                ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/25"
+                                : "bg-amber-500/15 text-amber-400 border border-amber-500/25"
+                            }`}
+                          >
+                            {generationMode === "ai" ? (
+                              <><Cpu className="w-3 h-3" /> AI</>
+                            ) : (
+                              <><Play className="w-3 h-3" /> Demo</>
+                            )}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-gray-500 mt-1 italic">
                         &quot;{formula.prompt}&quot;
                       </p>
@@ -301,6 +378,7 @@ function CreatePageInner() {
                     onClick={() => {
                       setFormula(null);
                       setHistory([]);
+                      setGenerationMode(null);
                     }}
                     className="btn-secondary text-sm"
                   >
@@ -350,6 +428,20 @@ function CreatePageInner() {
                 )}
               </AnimatePresence>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-surface-700 border border-surface-500 text-gray-300 text-sm px-4 py-2.5 rounded-lg shadow-lg"
+          >
+            {toastMessage}
           </motion.div>
         )}
       </AnimatePresence>

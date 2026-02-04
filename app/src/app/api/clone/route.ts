@@ -4,6 +4,13 @@ import { generateScentId } from "@/lib/utils";
 
 export async function POST(request: NextRequest) {
   try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return NextResponse.json(
+        { success: false, error: "ANTHROPIC_API_KEY not configured", demo: true },
+        { status: 503 }
+      );
+    }
+
     const body = await request.json();
     const { perfumeName } = body;
 

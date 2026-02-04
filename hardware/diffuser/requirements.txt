@@ -1,0 +1,55 @@
+# Prompt and Smell -- Ultrasonic Diffuser Dependencies
+#
+# Install with:  pip install -r requirements.txt
+#
+# Note: Some packages are platform-specific. See comments below.
+
+# --- GPIO Control (Raspberry Pi) ---
+# Install ONE of these. gpiozero is recommended (higher-level API).
+# These only work on Raspberry Pi. On other systems, the diffuser
+# controller will automatically fall back to simulation mode.
+gpiozero>=2.0,<3.0
+# RPi.GPIO>=0.7.0  # Alternative: lower-level GPIO library
+
+# --- Speech Recognition ---
+SpeechRecognition>=3.10,<4.0
+
+# PyAudio is required by SpeechRecognition for microphone access.
+# Installation can be tricky on some platforms:
+#   Raspberry Pi / Linux:  sudo apt install portaudio19-dev && pip install pyaudio
+#   macOS:                 brew install portaudio && pip install pyaudio
+#   Windows:               pip install pyaudio  (binary wheel usually available)
+PyAudio>=0.2.13,<1.0
+
+# --- Text-to-Speech ---
+pyttsx3>=2.90,<3.0
+
+# --- Anthropic Claude API ---
+anthropic>=0.39.0,<1.0
+
+# --- CLI Framework ---
+click>=8.1,<9.0
+
+# --- Rich Terminal Output ---
+# Tables, progress bars, panels, colored text
+rich>=13.0,<14.0
+
+# --- Data Validation ---
+pydantic>=2.0,<3.0
+
+# --- Optional: Local Speech Recognition (Whisper) ---
+# Uncomment the line below to enable offline speech recognition using
+# OpenAI Whisper. This requires ~1-3GB of disk space for model weights
+# and a reasonably powerful CPU (or GPU for faster inference).
+# openai-whisper>=20231117
+
+# --- Optional: NeoPixel LED Ring ---
+# Uncomment if using a NeoPixel LED ring for visual status feedback.
+# Only works on Raspberry Pi.
+# rpi_ws281x>=5.0,<6.0
+# adafruit-circuitpython-neopixel>=6.3,<7.0
+
+# --- Optional: OLED Display ---
+# Uncomment if using an SSD1306 OLED display for status readout.
+# adafruit-circuitpython-ssd1306>=2.12,<3.0
+# Pillow>=10.0,<11.0
