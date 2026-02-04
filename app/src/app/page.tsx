@@ -1,37 +1,138 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
-  Sparkles,
-  Cpu,
-  Droplets,
   ArrowRight,
+  Sun,
+  Moon,
+  Wind,
+  Hand,
+  Droplets,
   Heart,
-  Shuffle,
-  PenTool,
-  FlaskConical,
-  Printer,
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
-import { communityScents, examplePrompts } from "@/lib/mock-data";
-import { MiniScentWheel } from "@/components/ScentWheel";
-import { getCategoryColor } from "@/lib/utils";
 
-// Animated background orbs
+// ---------------------------------------------------------------------------
+// Module definitions
+// ---------------------------------------------------------------------------
+
+const modules = [
+  {
+    key: "atmosphere",
+    label: "ATMOSPHERE",
+    tagline: "Transform any room",
+    icon: Sun,
+    secondaryIcon: Moon,
+    color: "#F59E0B",
+    href: "/atmosphere",
+  },
+  {
+    key: "scent",
+    label: "SCENT",
+    tagline: "Smell any memory",
+    icon: Wind,
+    color: "#10B981",
+    href: "/scent",
+  },
+  {
+    key: "texture",
+    label: "TEXTURE",
+    tagline: "Feel any surface",
+    icon: Hand,
+    color: "#3B82F6",
+    href: "/texture",
+  },
+  {
+    key: "taste",
+    label: "TASTE",
+    tagline: "Taste the impossible",
+    icon: Droplets,
+    color: "#EC4899",
+    href: "/taste",
+  },
+  {
+    key: "pulse",
+    label: "PULSE",
+    tagline: "Share your heartbeat",
+    icon: Heart,
+    color: "#EF4444",
+    href: "/pulse",
+  },
+];
+
+const exampleExperiences = [
+  {
+    title: "Northern Lights in Iceland",
+    description:
+      "Aurora borealis rippling overhead. Crisp glacial air carries hints of volcanic mineral and arctic moss. Fingers trace the texture of fresh ice. A warm berry-spiced drink steadies you against the cold.",
+    activeModules: ["atmosphere", "scent", "texture", "taste", "pulse"],
+    prompt: "Northern lights in Iceland",
+  },
+  {
+    title: "Tokyo Jazz Bar at Midnight",
+    description:
+      "Smoky amber lighting pulses with a slow saxophone. Old leather seats, aged whiskey, subtle hinoki wood incense. The hum of the city fades as the music deepens.",
+    activeModules: ["atmosphere", "scent", "taste", "pulse"],
+    prompt: "Tokyo jazz bar at midnight",
+  },
+  {
+    title: "Grandmother's Kitchen on Christmas Morning",
+    description:
+      "Warm cinnamon and vanilla fill the air. Golden light from the oven. Soft dough yields under your hands. Hot cocoa with a hint of nutmeg. Steady, comforting heartbeat of home.",
+    activeModules: ["atmosphere", "scent", "texture", "taste", "pulse"],
+    prompt: "Grandmother's kitchen on Christmas morning",
+  },
+  {
+    title: "Walking Through a Rainy Forest",
+    description:
+      "Petrichor and wet pine needles. Mist softens every edge. Cool droplets on skin, spongy moss underfoot. The forest breathes in a slow, rhythmic pulse.",
+    activeModules: ["atmosphere", "scent", "texture", "pulse"],
+    prompt: "Walking through a rainy forest",
+  },
+];
+
+const howItWorksSteps = [
+  {
+    step: "Describe",
+    description:
+      "Type a prompt, speak aloud, or upload an image. Describe any real or imagined experience in natural language.",
+    color: "#FFD93D",
+  },
+  {
+    step: "Decompose",
+    description:
+      "Our AI analyzes your prompt and decomposes it into separate sensory channels -- atmosphere, scent, texture, taste, and pulse.",
+    color: "#FF6B9D",
+  },
+  {
+    step: "Experience",
+    description:
+      "Receive detailed outputs for each sense. Lighting recipes, scent formulas, haptic patterns, flavor profiles, and rhythmic guides.",
+    color: "#4ECDC4",
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Animated background
+// ---------------------------------------------------------------------------
+
 function BackgroundOrbs() {
+  const orbColors = ["#F59E0B", "#10B981", "#3B82F6", "#EC4899", "#EF4444"];
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {[...Array(5)].map((_, i) => (
+      {orbColors.map((color, i) => (
         <motion.div
           key={i}
           className="absolute rounded-full"
           style={{
-            width: 200 + i * 100,
-            height: 200 + i * 100,
-            left: `${15 + i * 18}%`,
-            top: `${10 + (i % 3) * 25}%`,
-            background: `radial-gradient(circle, rgba(212,165,116,${0.03 + i * 0.01}) 0%, transparent 70%)`,
+            width: 200 + i * 120,
+            height: 200 + i * 120,
+            left: `${10 + i * 18}%`,
+            top: `${8 + (i % 3) * 22}%`,
+            background: `radial-gradient(circle, ${color}08 0%, transparent 70%)`,
           }}
           animate={{
             x: [0, 30 * (i % 2 === 0 ? 1 : -1), 0],
@@ -49,9 +150,125 @@ function BackgroundOrbs() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Animated typing demo
+// ---------------------------------------------------------------------------
+
+function TypingDemo() {
+  const fullText = "Northern lights in Iceland";
+  const [displayText, setDisplayText] = useState("");
+  const [showCards, setShowCards] = useState(false);
+  const [phase, setPhase] = useState<"typing" | "cards" | "pause">("typing");
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    let charIndex = 0;
+
+    function typeNext() {
+      if (charIndex <= fullText.length) {
+        setDisplayText(fullText.slice(0, charIndex));
+        charIndex++;
+        timeout = setTimeout(typeNext, 60 + Math.random() * 40);
+      } else {
+        setPhase("cards");
+        timeout = setTimeout(() => {
+          setShowCards(true);
+        }, 400);
+      }
+    }
+
+    if (phase === "typing") {
+      setShowCards(false);
+      setDisplayText("");
+      charIndex = 0;
+      timeout = setTimeout(typeNext, 800);
+    }
+
+    if (phase === "cards") {
+      timeout = setTimeout(() => {
+        setPhase("pause");
+      }, 6000);
+    }
+
+    if (phase === "pause") {
+      timeout = setTimeout(() => {
+        setShowCards(false);
+        setPhase("typing");
+      }, 2000);
+    }
+
+    return () => clearTimeout(timeout);
+  }, [phase]);
+
+  const demoModules = [
+    { key: "atmosphere", label: "Atmosphere", color: "#F59E0B", desc: "Aurora lighting with green-violet shifts" },
+    { key: "scent", label: "Scent", color: "#10B981", desc: "Glacial air, volcanic mineral, arctic moss" },
+    { key: "texture", label: "Texture", color: "#3B82F6", desc: "Crisp ice crystals under fingertips" },
+    { key: "taste", label: "Taste", color: "#EC4899", desc: "Warm cloudberry and arctic thyme tea" },
+    { key: "pulse", label: "Pulse", color: "#EF4444", desc: "Slow, awestruck rhythm at 56 BPM" },
+  ];
+
+  return (
+    <motion.div
+      className="max-w-3xl mx-auto mt-14 mb-6"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8, duration: 0.6 }}
+    >
+      {/* Prompt bar */}
+      <div className="card px-5 py-4 mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-primary-400 flex-shrink-0" />
+          <span className="text-gray-300 text-sm font-mono flex-1 min-h-[1.25rem]">
+            {displayText}
+            <motion.span
+              className="inline-block w-0.5 h-4 bg-primary-400 ml-0.5 align-middle"
+              animate={{ opacity: [1, 0, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity }}
+            />
+          </span>
+        </div>
+      </div>
+
+      {/* Fan-out cards */}
+      {showCards && (
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+          {demoModules.map((mod, i) => (
+            <motion.div
+              key={mod.key}
+              className="rounded-xl p-3 border text-center"
+              style={{
+                backgroundColor: `${mod.color}08`,
+                borderColor: `${mod.color}25`,
+              }}
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
+            >
+              <div
+                className="text-[10px] font-bold tracking-wider mb-1"
+                style={{ color: mod.color }}
+              >
+                {mod.label.toUpperCase()}
+              </div>
+              <p className="text-[11px] text-gray-500 leading-snug">
+                {mod.desc}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Hero Section
+// ---------------------------------------------------------------------------
+
 function HeroSection() {
   return (
-    <section className="relative min-h-[85vh] flex items-center justify-center">
+    <section className="relative min-h-[90vh] flex items-center justify-center">
       <BackgroundOrbs />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -62,50 +279,30 @@ function HeroSection() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass text-xs text-primary-400 mb-8">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Generative Olfaction Platform</span>
+            <span>Multi-Sensory AI Platform</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-            <span className="gradient-text-light">Type a prompt.</span>
+            <span className="gradient-text-light">One prompt.</span>
             <br />
-            <span className="gradient-text">Get a scent.</span>
+            <span className="gradient-text">Every sense.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Transform words into fragrance formulas. Our AI understands
-            memories, moods, and moments -- then composes precise
-            olfactory blueprints you can actually produce.
+          <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-4 leading-relaxed">
+            The first multi-sensory AI platform. Describe an experience and we
+            will bring it to life across sight, sound, scent, touch, and taste.
           </p>
         </motion.div>
 
-        {/* Example prompts */}
-        <motion.div
-          className="flex flex-wrap justify-center gap-2 mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          {examplePrompts.slice(0, 3).map((prompt, i) => (
-            <Link key={prompt} href={`/create?prompt=${encodeURIComponent(prompt)}`}>
-              <motion.div
-                className="chip text-sm text-gray-400 hover:text-primary-300"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-              >
-                &quot;{prompt}&quot;
-              </motion.div>
-            </Link>
-          ))}
-        </motion.div>
+        {/* Animated typing demo */}
+        <TypingDemo />
 
         {/* CTA */}
         <motion.div
+          className="mt-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
+          transition={{ delay: 1.2, duration: 0.5 }}
         >
           <Link href="/create">
             <motion.button
@@ -113,8 +310,7 @@ function HeroSection() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
             >
-              <PenTool className="w-5 h-5" />
-              Start Creating
+              Try the Unified Experience
               <ArrowRight className="w-5 h-5" />
             </motion.button>
           </Link>
@@ -124,31 +320,164 @@ function HeroSection() {
   );
 }
 
-function HowItWorks() {
-  const steps = [
-    {
-      icon: PenTool,
-      title: "Describe",
-      description:
-        "Write a natural language prompt describing any scent -- a memory, a place, a mood, a dream.",
-      color: "#FFD93D",
-    },
-    {
-      icon: FlaskConical,
-      title: "Generate",
-      description:
-        "Our AI composes a precise formula with real ingredients, percentages, and note structure in OSC format.",
-      color: "#FF6B9D",
-    },
-    {
-      icon: Printer,
-      title: "Dispense",
-      description:
-        "Send the formula to a compatible scent printer or use it as a blueprint for manual composition.",
-      color: "#4ECDC4",
-    },
-  ];
+// ---------------------------------------------------------------------------
+// Module Showcase
+// ---------------------------------------------------------------------------
 
+function ModuleShowcase() {
+  return (
+    <section className="py-24 px-6">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="section-heading">Five Senses, One Platform</h2>
+          <p className="section-subheading">
+            Each module generates rich, actionable output for a different sensory
+            channel
+          </p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-5">
+          {modules.map((mod, i) => {
+            const Icon = mod.icon;
+            return (
+              <motion.div
+                key={mod.key}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
+              >
+                <Link href={mod.href}>
+                  <div
+                    className="card group cursor-pointer text-center hover:shadow-glow transition-all duration-300"
+                    style={
+                      {
+                        "--tw-shadow-color": `${mod.color}15`,
+                      } as React.CSSProperties
+                    }
+                  >
+                    <div className="mb-4">
+                      <div
+                        className="w-12 h-12 rounded-2xl mx-auto flex items-center justify-center transition-transform group-hover:scale-110"
+                        style={{
+                          backgroundColor: `${mod.color}15`,
+                          border: `1px solid ${mod.color}30`,
+                        }}
+                      >
+                        <Icon
+                          className="w-5 h-5"
+                          style={{ color: mod.color }}
+                        />
+                      </div>
+                    </div>
+                    <div
+                      className="text-xs font-bold tracking-wider mb-2"
+                      style={{ color: mod.color }}
+                    >
+                      {mod.label}
+                    </div>
+                    <p className="text-sm text-gray-400 leading-relaxed">
+                      {mod.tagline}
+                    </p>
+                    <div className="mt-3 flex items-center justify-center gap-1 text-xs text-gray-600 group-hover:text-gray-400 transition-colors">
+                      <span>Explore</span>
+                      <ChevronRight className="w-3 h-3" />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Example Experiences
+// ---------------------------------------------------------------------------
+
+function ExampleExperiences() {
+  const moduleColorMap: Record<string, string> = {
+    atmosphere: "#F59E0B",
+    scent: "#10B981",
+    texture: "#3B82F6",
+    taste: "#EC4899",
+    pulse: "#EF4444",
+  };
+
+  return (
+    <section className="py-24 px-6 bg-surface-800/20">
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="section-heading">Example Experiences</h2>
+          <p className="section-subheading">
+            See how a single prompt becomes a complete multi-sensory experience
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {exampleExperiences.map((exp, i) => (
+            <motion.div
+              key={exp.title}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1, duration: 0.4 }}
+            >
+              <Link
+                href={`/create?prompt=${encodeURIComponent(exp.prompt)}`}
+              >
+                <div className="card group cursor-pointer hover:shadow-glow h-full">
+                  <h3 className="text-lg font-semibold text-gray-200 group-hover:text-primary-400 transition-colors mb-3">
+                    {exp.title}
+                  </h3>
+                  <p className="text-sm text-gray-400 leading-relaxed mb-4">
+                    {exp.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {exp.activeModules.map((mod) => (
+                      <span
+                        key={mod}
+                        className="text-[10px] font-bold tracking-wider px-2 py-0.5 rounded-full"
+                        style={{
+                          backgroundColor: `${moduleColorMap[mod]}15`,
+                          color: moduleColorMap[mod],
+                          border: `1px solid ${moduleColorMap[mod]}30`,
+                        }}
+                      >
+                        {mod.toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// How It Works
+// ---------------------------------------------------------------------------
+
+function HowItWorks() {
   return (
     <section className="py-24 px-6">
       <div className="max-w-6xl mx-auto">
@@ -161,14 +490,14 @@ function HowItWorks() {
         >
           <h2 className="section-heading">How It Works</h2>
           <p className="section-subheading">
-            From words to molecules in three steps
+            From words to a complete sensory experience in three steps
           </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {steps.map((step, i) => (
+          {howItWorksSteps.map((step, i) => (
             <motion.div
-              key={step.title}
+              key={step.step}
               className="card text-center group"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -183,16 +512,18 @@ function HowItWorks() {
                     border: `1px solid ${step.color}30`,
                   }}
                 >
-                  <step.icon
-                    className="w-6 h-6"
+                  <span
+                    className="text-xl font-bold"
                     style={{ color: step.color }}
-                  />
+                  >
+                    {i + 1}
+                  </span>
                 </div>
                 <div className="text-xs font-mono text-gray-600 mb-2">
                   Step {i + 1}
                 </div>
                 <h3 className="text-xl font-semibold text-gray-200">
-                  {step.title}
+                  {step.step}
                 </h3>
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
@@ -206,107 +537,55 @@ function HowItWorks() {
   );
 }
 
-function FeaturedScents() {
-  const featured = communityScents.slice(0, 6);
+// ---------------------------------------------------------------------------
+// CTA Banner
+// ---------------------------------------------------------------------------
 
+function CTABanner() {
   return (
-    <section className="py-24 px-6 bg-surface-800/20">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-24 px-6">
+      <div className="max-w-3xl mx-auto text-center">
         <motion.div
-          className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="section-heading">Community Creations</h2>
-          <p className="section-subheading">
-            Explore scents crafted by our community of olfactory designers
+          <h2 className="text-3xl md:text-4xl font-bold gradient-text mb-4">
+            Ready to feel everything?
+          </h2>
+          <p className="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
+            One prompt unlocks atmosphere, scent, texture, taste, and pulse. Try
+            the unified creator now.
           </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {featured.map((scent, i) => (
-            <motion.div
-              key={scent.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08, duration: 0.4 }}
-            >
-              <Link href={`/scent/${scent.id}`}>
-                <div className="card group cursor-pointer hover:shadow-glow">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1 min-w-0 mr-3">
-                      <h3 className="text-lg font-semibold text-gray-200 group-hover:text-primary-400 transition-colors truncate">
-                        {scent.name}
-                      </h3>
-                      <p className="text-xs text-gray-500 mt-1">
-                        by {scent.creator}
-                      </p>
-                    </div>
-                    <MiniScentWheel
-                      ingredients={scent.ingredients}
-                      size={50}
-                    />
-                  </div>
-
-                  <p className="text-sm text-gray-400 line-clamp-2 mb-4 leading-relaxed">
-                    {scent.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {scent.tags.slice(0, 3).map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-surface-600/40 text-gray-500"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-gray-600">
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <Heart className="w-3 h-3" />
-                        {Math.floor(Math.random() * 300) + 50}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Shuffle className="w-3 h-3" />
-                        {Math.floor(Math.random() * 20) + 3}
-                      </span>
-                    </div>
-                    <span className="capitalize">{scent.sillage}</span>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        <div className="text-center mt-10">
-          <Link href="/gallery">
+          <Link href="/create">
             <motion.button
-              className="btn-secondary inline-flex items-center gap-2"
+              className="btn-primary text-lg px-10 py-4 inline-flex items-center gap-3"
               whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Explore All Scents
-              <ArrowRight className="w-4 h-4" />
+              Create an Experience
+              <ArrowRight className="w-5 h-5" />
             </motion.button>
           </Link>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
+// ---------------------------------------------------------------------------
+// Page
+// ---------------------------------------------------------------------------
+
 export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <ModuleShowcase />
+      <ExampleExperiences />
       <HowItWorks />
-      <FeaturedScents />
+      <CTABanner />
     </>
   );
 }

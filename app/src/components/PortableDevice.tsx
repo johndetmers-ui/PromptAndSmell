@@ -303,7 +303,7 @@ export default function PortableDevice({ formula }: PortableDeviceProps) {
         statChar.addEventListener(
           "characteristicvaluechanged",
           (event: Event) => {
-            const target = event.target as BluetoothRemoteGATTCharacteristic;
+            const target = event.target as unknown as BluetoothRemoteGATTCharacteristic;
             const value = target.value;
             if (value) {
               const text = new TextDecoder().decode(value);
