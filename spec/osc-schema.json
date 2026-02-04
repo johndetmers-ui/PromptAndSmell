@@ -1,0 +1,593 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://promptandsmell.com/schemas/osc/v1.0/osc-schema.json",
+  "title": "Open Scent Code (OSC) v1.0",
+  "description": "A machine-readable format for describing fragrance formulas. OSC enables interoperability between scent generation tools, visualization software, and hardware dispensers.",
+  "type": "object",
+  "required": ["osc_version", "metadata", "formula"],
+  "additionalProperties": false,
+  "properties": {
+    "osc_version": {
+      "type": "string",
+      "const": "1.0",
+      "description": "The version of the OSC specification this document conforms to."
+    },
+    "metadata": {
+      "$ref": "#/$defs/Metadata"
+    },
+    "formula": {
+      "$ref": "#/$defs/Formula"
+    },
+    "accords": {
+      "$ref": "#/$defs/Accords"
+    },
+    "evolution": {
+      "$ref": "#/$defs/Evolution"
+    },
+    "safety": {
+      "$ref": "#/$defs/Safety"
+    },
+    "hardware": {
+      "$ref": "#/$defs/Hardware"
+    }
+  },
+  "$defs": {
+    "Metadata": {
+      "type": "object",
+      "description": "Descriptive information about the fragrance formula.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "Human-readable name of the fragrance."
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Prose description of the scent, its inspiration, and character."
+        },
+        "author": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Creator name, username, or identifier."
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^\\d+\\.\\d+(\\.\\d+)?(-[a-zA-Z0-9.]+)?$",
+          "description": "Formula version using semantic versioning (e.g., '1.0.0', '2.1.0-beta')."
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Creation timestamp in ISO 8601 format (e.g., '2026-01-15T10:30:00Z')."
+        },
+        "updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last modification timestamp in ISO 8601 format."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9 _-]*$"
+          },
+          "minItems": 0,
+          "maxItems": 20,
+          "uniqueItems": true,
+          "description": "Searchable tags for discovery and categorization."
+        },
+        "mood": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "minItems": 0,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "description": "Mood descriptors (e.g., 'romantic', 'energizing', 'cozy', 'confident')."
+        },
+        "season": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["spring", "summer", "autumn", "winter", "all"]
+          },
+          "minItems": 0,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "description": "Recommended seasons for wearing this fragrance."
+        },
+        "intensity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Overall intensity rating from 1 (skin scent) to 10 (powerhouse)."
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["masculine", "feminine", "unisex"],
+          "description": "Gender expression of the fragrance. All fragrances are wearable by anyone; this reflects marketing positioning."
+        },
+        "occasion": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "minItems": 0,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "description": "Suggested occasions (e.g., 'office', 'date night', 'casual', 'formal')."
+        },
+        "inspiration": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "The original prompt or inspiration behind this formula."
+        },
+        "parent_id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_-]+$",
+          "description": "If this formula was remixed/forked, the ID of the parent formula."
+        },
+        "license": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "License under which this formula is shared (e.g., 'CC-BY-4.0', 'proprietary')."
+        }
+      }
+    },
+    "IngredientCategory": {
+      "type": "string",
+      "enum": [
+        "citrus",
+        "floral",
+        "woody",
+        "oriental",
+        "fresh",
+        "aromatic",
+        "musk",
+        "amber",
+        "green",
+        "fruity",
+        "spicy",
+        "gourmand",
+        "aquatic",
+        "leather",
+        "animalic",
+        "balsamic",
+        "powdery",
+        "earthy",
+        "smoky",
+        "herbal"
+      ],
+      "description": "The olfactory category of the ingredient based on the extended fragrance wheel."
+    },
+    "NoteType": {
+      "type": "string",
+      "enum": ["top", "middle", "base", "modifier"],
+      "description": "The position of the ingredient in the fragrance pyramid. 'modifier' is for functional ingredients that affect the overall blend without belonging to a specific pyramid layer."
+    },
+    "Volatility": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "The evaporation rate of the ingredient. High = top note speed, Medium = heart note speed, Low = base note speed."
+    },
+    "Ingredient": {
+      "type": "object",
+      "description": "A single ingredient in the fragrance formula with its properties and proportions.",
+      "required": ["ingredient", "category", "note_type", "percentage"],
+      "additionalProperties": false,
+      "properties": {
+        "ingredient": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200,
+          "description": "The common name of the ingredient (e.g., 'Bergamot', 'Iso E Super', 'Hedione')."
+        },
+        "cas_number": {
+          "type": "string",
+          "pattern": "^\\d{2,7}-\\d{2}-\\d$",
+          "description": "The CAS (Chemical Abstracts Service) registry number for precise chemical identification (e.g., '78-70-6' for Linalool)."
+        },
+        "iupac_name": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "The IUPAC systematic chemical name, if applicable."
+        },
+        "category": {
+          "$ref": "#/$defs/IngredientCategory"
+        },
+        "note_type": {
+          "$ref": "#/$defs/NoteType"
+        },
+        "percentage": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "multipleOf": 0.01,
+          "description": "The percentage of this ingredient in the total formula. All ingredient percentages must sum to 100."
+        },
+        "intensity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "The olfactory intensity of this ingredient at the given percentage, from 1 (barely perceptible) to 10 (dominant)."
+        },
+        "volatility": {
+          "$ref": "#/$defs/Volatility"
+        },
+        "odor_description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "A brief prose description of how this ingredient smells (e.g., 'bright, sparkling citrus with a slightly bitter green peel facet')."
+        },
+        "natural": {
+          "type": "boolean",
+          "description": "Whether this ingredient is naturally derived (true) or synthetic (false)."
+        },
+        "supplier": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Optional supplier or source of this ingredient."
+        },
+        "cost_tier": {
+          "type": "string",
+          "enum": ["budget", "moderate", "premium", "luxury"],
+          "description": "Relative cost category of this ingredient."
+        }
+      }
+    },
+    "Formula": {
+      "type": "array",
+      "description": "The complete list of ingredients that compose this fragrance. Percentages must sum to exactly 100 (with a tolerance of 0.1 for rounding).",
+      "items": {
+        "$ref": "#/$defs/Ingredient"
+      },
+      "minItems": 2,
+      "maxItems": 100
+    },
+    "Accords": {
+      "type": "array",
+      "description": "Named emergent scent profiles created by the combination of ingredients. These are not individual ingredients but perceptual gestalts.",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "The name of the accord (e.g., 'fougere', 'chypre', 'amber', 'marine', 'leather')."
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Description of the accord's scent character."
+          },
+          "contributing_ingredients": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "minItems": 2,
+            "maxItems": 20,
+            "description": "Ingredient names from the formula that contribute to this accord."
+          },
+          "strength": {
+            "type": "string",
+            "enum": ["dominant", "supporting", "subtle"],
+            "description": "How prominent this accord is in the overall composition."
+          }
+        }
+      },
+      "minItems": 0,
+      "maxItems": 15,
+      "uniqueItems": true
+    },
+    "EvolutionPhase": {
+      "type": "object",
+      "description": "A single phase of the fragrance's evolution over time.",
+      "required": ["duration_minutes", "dominant_ingredients", "character"],
+      "additionalProperties": false,
+      "properties": {
+        "duration_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440,
+          "description": "How long this phase lasts in minutes."
+        },
+        "dominant_ingredients": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1,
+          "maxItems": 10,
+          "description": "The ingredients most prominent during this phase. Names must match entries in the formula array."
+        },
+        "character": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500,
+          "description": "Prose description of the scent during this phase."
+        },
+        "intensity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Overall intensity during this phase."
+        },
+        "sillage": {
+          "type": "string",
+          "enum": ["intimate", "moderate", "strong", "enormous"],
+          "description": "The projection/trail of the fragrance during this phase."
+        }
+      }
+    },
+    "Evolution": {
+      "type": "object",
+      "description": "Describes how the fragrance changes over time as different ingredients evaporate at different rates.",
+      "required": ["opening", "heart", "drydown"],
+      "additionalProperties": false,
+      "properties": {
+        "opening": {
+          "allOf": [
+            { "$ref": "#/$defs/EvolutionPhase" },
+            {
+              "description": "The first impression of the fragrance (typically 0-30 minutes). Dominated by top notes."
+            }
+          ]
+        },
+        "heart": {
+          "allOf": [
+            { "$ref": "#/$defs/EvolutionPhase" },
+            {
+              "description": "The core character of the fragrance (typically 30-180 minutes). Dominated by middle/heart notes."
+            }
+          ]
+        },
+        "drydown": {
+          "allOf": [
+            { "$ref": "#/$defs/EvolutionPhase" },
+            {
+              "description": "The final phase of the fragrance (typically 180+ minutes). Dominated by base notes."
+            }
+          ]
+        },
+        "total_longevity_hours": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 48,
+          "description": "Estimated total longevity in hours before the scent becomes imperceptible."
+        }
+      }
+    },
+    "ConcentrationCategory": {
+      "type": "string",
+      "enum": ["edc", "edt", "edp", "parfum", "extrait", "solinote", "body_mist", "oil"],
+      "description": "The concentration category of the fragrance. EDC: 3-5%, EDT: 5-15%, EDP: 15-20%, Parfum: 20-30%, Extrait: 30-40%."
+    },
+    "Safety": {
+      "type": "object",
+      "description": "Safety and regulatory compliance information for the formula.",
+      "required": ["ifra_compliant"],
+      "additionalProperties": false,
+      "properties": {
+        "ifra_compliant": {
+          "type": "boolean",
+          "description": "Whether the formula complies with current IFRA (International Fragrance Association) standards."
+        },
+        "ifra_version": {
+          "type": "string",
+          "pattern": "^\\d+(\\.\\d+)?$",
+          "description": "The version of the IFRA standard the formula was validated against (e.g., '51.0')."
+        },
+        "ifra_category": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 11,
+          "description": "The IFRA product category (1-11) the formula is intended for. Category 4 is fine fragrance."
+        },
+        "allergens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "percentage"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "description": "Name of the allergen."
+              },
+              "cas_number": {
+                "type": "string",
+                "pattern": "^\\d{2,7}-\\d{2}-\\d$",
+                "description": "CAS number of the allergen."
+              },
+              "percentage": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 100,
+                "description": "Percentage of this allergen in the final product."
+              },
+              "declaration_required": {
+                "type": "boolean",
+                "description": "Whether this allergen must be declared on the label under EU regulations."
+              }
+            }
+          },
+          "maxItems": 30,
+          "description": "List of allergens present in the formula with their concentrations."
+        },
+        "concentration": {
+          "$ref": "#/$defs/ConcentrationCategory"
+        },
+        "max_skin_exposure_percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Maximum recommended percentage when applied to skin, considering all restricted ingredients."
+        },
+        "restricted_ingredients": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["ingredient", "limit_percent", "actual_percent"],
+            "additionalProperties": false,
+            "properties": {
+              "ingredient": {
+                "type": "string",
+                "description": "Name of the restricted ingredient."
+              },
+              "cas_number": {
+                "type": "string",
+                "pattern": "^\\d{2,7}-\\d{2}-\\d$"
+              },
+              "limit_percent": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Maximum allowed percentage per IFRA."
+              },
+              "actual_percent": {
+                "type": "number",
+                "minimum": 0,
+                "description": "Actual percentage in this formula."
+              },
+              "compliant": {
+                "type": "boolean",
+                "description": "Whether actual usage is within the IFRA limit."
+              }
+            }
+          },
+          "description": "Ingredients with IFRA restrictions and their compliance status."
+        },
+        "phototoxic": {
+          "type": "boolean",
+          "description": "Whether the formula contains phototoxic ingredients at levels that require a UV warning."
+        },
+        "vegan": {
+          "type": "boolean",
+          "description": "Whether all ingredients are vegan (no animal-derived materials)."
+        },
+        "eu_cosmetics_regulation_compliant": {
+          "type": "boolean",
+          "description": "Whether the formula complies with EU Cosmetics Regulation (EC) No 1223/2009."
+        },
+        "warnings": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "maxItems": 20,
+          "description": "Human-readable safety warnings or notes."
+        }
+      }
+    },
+    "ChannelMapping": {
+      "type": "object",
+      "description": "Maps a formula ingredient to a physical pump channel on the hardware dispenser.",
+      "required": ["ingredient", "channel", "volume_ml"],
+      "additionalProperties": false,
+      "properties": {
+        "ingredient": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Ingredient name, which must match an entry in the formula array."
+        },
+        "channel": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 32,
+          "description": "The physical pump channel number on the dispenser (1-indexed)."
+        },
+        "volume_ml": {
+          "type": "number",
+          "minimum": 0.01,
+          "maximum": 100,
+          "multipleOf": 0.01,
+          "description": "The volume to dispense in milliliters."
+        },
+        "flow_rate": {
+          "type": "number",
+          "minimum": 0.001,
+          "maximum": 10,
+          "description": "Flow rate in milliliters per second."
+        },
+        "dispense_order": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "The order in which to dispense this ingredient (for ingredients that should not be mixed simultaneously)."
+        },
+        "pre_stir": {
+          "type": "boolean",
+          "description": "Whether the cartridge should be stirred/agitated before dispensing."
+        }
+      }
+    },
+    "Hardware": {
+      "type": "object",
+      "description": "Optional hardware configuration for physical scent dispensing.",
+      "required": ["device_profile", "channel_mappings"],
+      "additionalProperties": false,
+      "properties": {
+        "device_profile": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "The hardware device profile identifier (e.g., 'ps-dispenser-v1', 'custom-8ch')."
+        },
+        "total_volume_ml": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 500,
+          "description": "Total volume to produce in milliliters."
+        },
+        "channel_mappings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChannelMapping"
+          },
+          "minItems": 1,
+          "maxItems": 32,
+          "description": "Array of channel-to-ingredient mappings for the dispenser."
+        },
+        "mix_duration_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 600,
+          "description": "How long to mix/agitate the blend after all ingredients are dispensed."
+        },
+        "temperature_celsius": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 60,
+          "description": "Target temperature for dispensing, if the hardware supports temperature control."
+        },
+        "calibration_date": {
+          "type": "string",
+          "format": "date",
+          "description": "When the hardware was last calibrated."
+        },
+        "notes": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Additional notes for the hardware operator."
+        }
+      }
+    }
+  }
+}

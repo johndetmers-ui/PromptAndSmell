@@ -1,0 +1,15 @@
+# Prompt and Smell -- Hardware Controller Dependencies
+#
+# Install with:  pip install -r requirements.txt
+
+# Serial communication with Arduino/Raspberry Pi
+pyserial>=3.5,<4.0
+
+# CLI framework for argument parsing and interactive prompts
+click>=8.1,<9.0
+
+# Rich terminal output: tables, progress bars, colored text
+rich>=13.0,<14.0
+
+# Data validation and settings management
+pydantic>=2.0,<3.0

@@ -1,0 +1,140 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --color-primary: #D4A574;
+  --color-primary-dark: #C49A6C;
+  --color-bg-deepest: #0A0A0F;
+  --color-bg-deep: #12121A;
+  --color-bg-mid: #1A1A2E;
+  --color-accent-warm: #E8B87D;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--color-bg-deepest);
+    color: #E8E0D8;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(212, 165, 116, 0.3);
+    color: #fff;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0A0A0F;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #333350;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4A4A6A;
+  }
+}
+
+@layer components {
+  .glass {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .glass-strong {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #D4A574, #E8B87D, #C49A6C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .gradient-text-light {
+    background: linear-gradient(135deg, #F0D9C0, #FFFFFF, #F0D9C0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .btn-primary {
+    @apply px-6 py-3 bg-gradient-to-r from-primary-400 to-primary-500 text-surface-900 font-semibold rounded-lg
+    hover:from-primary-300 hover:to-primary-400 transition-all duration-300
+    shadow-glow hover:shadow-glow-lg active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 glass rounded-lg text-primary-300 font-medium
+    hover:glass-hover transition-all duration-300 hover:text-primary-200;
+  }
+
+  .card {
+    @apply glass rounded-xl p-6 transition-all duration-300 hover:glass-hover;
+  }
+
+  .input-field {
+    @apply w-full bg-surface-800/50 border border-surface-500/30 rounded-lg px-4 py-3
+    text-gray-200 placeholder-gray-500 focus:outline-none focus:border-primary-400/50
+    focus:ring-1 focus:ring-primary-400/30 transition-all duration-300;
+  }
+
+  .chip {
+    @apply inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium
+    glass cursor-pointer hover:glass-hover transition-all duration-200;
+  }
+
+  .section-heading {
+    @apply text-3xl font-bold gradient-text mb-2;
+  }
+
+  .section-subheading {
+    @apply text-gray-400 text-lg mb-8;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

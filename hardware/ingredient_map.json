@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "description": "Pump channel to ingredient mapping for the Prompt and Smell dispenser. Each channel corresponds to a physical peristaltic pump loaded with the specified ingredient.",
+  "total_channels": 16,
+  "channels": [
+    {
+      "channel": 0,
+      "ingredient": "Ethanol (denatured)",
+      "cas": "64-17-5",
+      "category": "carrier",
+      "flow_rate_ml_per_min": 5.0,
+      "max_volume_ml": 50.0,
+      "reservoir_volume_ml": 500,
+      "notes": "Primary carrier solvent. 190-proof perfumer's alcohol. High flow rate for bulk dispensing."
+    },
+    {
+      "channel": 1,
+      "ingredient": "Dipropylene Glycol (DPG)",
+      "cas": "25265-71-8",
+      "category": "carrier",
+      "flow_rate_ml_per_min": 3.0,
+      "max_volume_ml": 30.0,
+      "reservoir_volume_ml": 250,
+      "notes": "Secondary carrier and fixative. Nearly odorless. Helps fragrance last longer on skin."
+    },
+    {
+      "channel": 2,
+      "ingredient": "Isopropyl Myristate (IPM)",
+      "cas": "110-27-0",
+      "category": "carrier",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 10.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Emollient carrier. Improves skin absorption and feel."
+    },
+    {
+      "channel": 3,
+      "ingredient": "Bergamot Oil",
+      "cas": "8007-75-8",
+      "category": "citrus",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 5.0,
+      "reservoir_volume_ml": 50,
+      "notes": "Top note citrus. Use bergapten-free (FCF) grade. IFRA max 2.68% for expressed."
+    },
+    {
+      "channel": 4,
+      "ingredient": "Linalool",
+      "cas": "78-70-6",
+      "category": "fresh-floral",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 5.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Versatile fresh-floral material. Bridges citrus and floral accords. Allergen - must be declared."
+    },
+    {
+      "channel": 5,
+      "ingredient": "Hedione",
+      "cas": "24851-98-7",
+      "category": "fresh-floral",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 10.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Transparent jasmine-like diffuser. Can be used at high percentages. Excellent radiance booster."
+    },
+    {
+      "channel": 6,
+      "ingredient": "Rose Absolute",
+      "cas": "8007-01-0",
+      "category": "floral",
+      "flow_rate_ml_per_min": 2.0,
+      "max_volume_ml": 3.0,
+      "reservoir_volume_ml": 30,
+      "notes": "Heart note floral. Rich and honeyed. Expensive; dispense precisely."
+    },
+    {
+      "channel": 7,
+      "ingredient": "Jasmine Absolute",
+      "cas": "8022-96-6",
+      "category": "floral",
+      "flow_rate_ml_per_min": 2.0,
+      "max_volume_ml": 3.0,
+      "reservoir_volume_ml": 30,
+      "notes": "Heart note floral. Warm and indolic. Expensive; dispense precisely."
+    },
+    {
+      "channel": 8,
+      "ingredient": "Iso E Super",
+      "cas": "54464-57-2",
+      "category": "woody",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 10.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Versatile woody base material. Smooth, velvety, skin-like. Can be used at high percentages."
+    },
+    {
+      "channel": 9,
+      "ingredient": "Cedarwood Oil (Atlas)",
+      "cas": "8000-27-9",
+      "category": "woody",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 8.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Base note woody. Warm pencil-shavings character. Good fixative."
+    },
+    {
+      "channel": 10,
+      "ingredient": "Sandalwood Oil",
+      "cas": "8006-87-9",
+      "category": "woody",
+      "flow_rate_ml_per_min": 2.0,
+      "max_volume_ml": 5.0,
+      "reservoir_volume_ml": 50,
+      "notes": "Base note woody. Creamy, smooth. Use Australian (S. spicatum) for sustainability."
+    },
+    {
+      "channel": 11,
+      "ingredient": "Vanillin",
+      "cas": "121-33-5",
+      "category": "gourmand",
+      "flow_rate_ml_per_min": 2.0,
+      "max_volume_ml": 5.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Base note gourmand. Pre-dissolved in DPG at 10% for accurate dispensing."
+    },
+    {
+      "channel": 12,
+      "ingredient": "Ambroxan",
+      "cas": "6790-58-5",
+      "category": "amber",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 8.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Base note amber/marine. Warm, salty, woody. Good at 2-15%. Pre-dissolved in DPG."
+    },
+    {
+      "channel": 13,
+      "ingredient": "Galaxolide",
+      "cas": "1222-05-5",
+      "category": "musk",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 8.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Base note musk. Clean, sweet, powdery. Provides long-lasting skin scent."
+    },
+    {
+      "channel": 14,
+      "ingredient": "Patchouli Oil",
+      "cas": "8014-09-3",
+      "category": "woody-earthy",
+      "flow_rate_ml_per_min": 2.0,
+      "max_volume_ml": 5.0,
+      "reservoir_volume_ml": 50,
+      "notes": "Base note earthy-woody. Dark, rich, slightly sweet. Ages well."
+    },
+    {
+      "channel": 15,
+      "ingredient": "Dihydromyrcenol",
+      "cas": "18479-58-8",
+      "category": "fresh",
+      "flow_rate_ml_per_min": 2.5,
+      "max_volume_ml": 8.0,
+      "reservoir_volume_ml": 100,
+      "notes": "Top note fresh. Clean, citrus-metallic. The backbone of many modern fresh masculines."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+node_modules/
+.next/
+.env
+.env.local
+.env.production
+*.pyc
+__pycache__/
+calibration.json
+.DS_Store
+Thumbs.db
